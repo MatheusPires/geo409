@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>Geo409 Task H Starter</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: Lato, sans-serif;
+            color: #0D0000;
+        }
+        header {
+            padding: 6px 10%;
+        }
+        h1 {
+            display: inline-block;
+            margin-right: 20px;
+            color: #001323;
+        }
+        h2 {
+            display: inline-block;
+            color: #001323;
+        }
+        #map {
+            width: 80%;
+            height: 540px;
+            margin: 10px auto;
+        }
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+        p {
+            font-size: 1em;
+            color: #001323;
+        }
+        /* Additional style rules go here! */
+        
+        .blue {
+            color: #165bb6;
+        }
+        .red {
+            color: #cc0000;
+        }
+        .purple {
+            color: #b6165b; 
+        }
+        
+
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Matheus Caputo Pires</h1>
+        <h2>Map of my usual walk or bus path.</h2>
+    </header>
+
+    <div id='map'></div>
+
+    <footer>
+        <p>Map authored by Matheus Caputo Pires</p>
+        <p>Additional information about the data and map goes here.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus. Duis a elit eget risus dictum vehicula id eu elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed sed enim nisl. Vestibulum commodo imperdiet lacus, sed facilisis erat placerat sit amet. Nulla consequat malesuada neque eget aliquet. Integer non convallis nisl, gravida ultrices ex. Fusce nec vestibulum elit. Sed elementum lectus ipsum, vulputate elementum ex laoreet a. Aenean eu ex varius, varius felis vitae, efficitur nulla. Quisque pretium laoreet ante, in sodales dui vehicula at. Mauris eu sem sapien.
+        </p>
+    </footer>
+
+    <script>
+
+        var map = L.map('map', {
+            center: [38.03122513867286, -84.50035572052002],
+            zoom: 15,
+        });
+       
+        var tiles = L.tileLayer('http://a{s}.acetate.geoiq.com/tiles/acetate-hillshading/{z}/{x}/{y}.png', {
+            attribution: '&copy;2012 Esri & Stamen, Data from OSM and Natural Earth',
+            subdomains: '0123',
+            minZoom: 4,
+            maxZoom: 30
+        });
+        map.addLayer(tiles);
+        
+        // Begin writing/modifying code for Task H here
+        
+        var BrazilLocations = {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {
+                "marker-color": "#ffffff",
+                "marker-size": "medium",
+                "marker-symbol": "",
+                "Name": "University Trails",
+                "size": 80
+              },
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  -84.5242166519165,
+                  38.041171098678284
+                ]
+              }
+            },
+            {
+              "type": "Feature",
+              "properties": {
+                "Name": "Whitehall",
+                "size" : 30
+              },
+              "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                  [
+                    [
+                      -84.50435757637024,
+                      38.038154497357255
+                    ],
+                    [
+                      -84.50389623641968,
+                      38.038450248078945
+                    ],
+                    [
+                      -84.50339198112488,
+                      38.03797704635095
+                    ],
+                    [
+                      -84.50383186340332,
+                      38.03767284362552
+                    ],
+                    [
+                      -84.50435757637024,
+                      38.038154497357255
+                    ]
+                  ]
+                ]
+              }
+            },
+            {
+              "type": "Feature",
+              "properties": {
+                "Name": "Woodland Glen",
+                "size": 20
+              },
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  -84.50035572052002,
+                  38.03122513867286
+                ]
+              }
+            },
+            {
+              "type": "Feature",
+              "properties": {
+                "Name": "Shuttle Pickup",
+                "size" : 20
+              },
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  -84.5050173997879,
+                  38.039029071035124
+                ]
+              }
+            },
+            {
+              "type": "Feature",
+              "properties": {
+                "Name": "Route to my GF`s house"
+              },
+              "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                  [
+                    -84.50035035610199,
+                    38.03122513867286
+                  ],
+                  [
+                    -84.50052201747894,
+                    38.03134767570906
+                  ],
+                  [
+                    -84.49901461601257,
+                    38.032399795618396
+                  ],
+                  [
+                    -84.50279116630553,
+                    38.03572084607037
+                  ],
+                  [
+                    -84.50120329856873,
+                    38.036827829425
+                  ],
+                  [
+                    -84.50239419937134,
+                    38.037926345984474
+                  ],
+                  [
+                    -84.50328469276428,
+                    38.03825589773924
+                  ],
+                  [
+                    -84.50463652610779,
+                    38.03936284277691
+                  ],
+                  [
+                    -84.50500130653381,
+                    38.03904174593918
+                  ],
+                  [
+                    -84.50574159622192,
+                    38.03860234798502
+                  ],
+                  [
+                    -84.50635313987732,
+                    38.0388896469457
+                  ],
+                  [
+                    -84.50679302215576,
+                    38.038991046309796
+                  ],
+                  [
+                    -84.50830578804016,
+                    38.03492651182622
+                  ],
+                  [
+                    -84.50933575630188,
+                    38.03508706944257
+                  ],
+                  [
+                    -84.51200723648071,
+                    38.03575464733647
+                  ],
+                  [
+                    -84.51321959495544,
+                    38.03643911961877
+                  ],
+                  [
+                    -84.51382040977478,
+                    38.03714048581554
+                  ],
+                  [
+                    -84.51454997062683,
+                    38.03813759727994
+                  ],
+                  [
+                    -84.5152473449707,
+                    38.03882204729164
+                  ],
+                  [
+                    -84.51583743095398,
+                    38.039506490906405
+                  ],
+                  [
+                    -84.5168137550354,
+                    38.04025852651462
+                  ],
+                  [
+                    -84.5176613330841,
+                    38.04044442176664
+                  ],
+                  [
+                    -84.51810121536255,
+                    38.04046132131158
+                  ],
+                  [
+                    -84.52048301696777,
+                    38.03994588343569
+                  ],
+                  [
+                    -84.52111601829529,
+                    38.039861385077096
+                  ],
+                  [
+                    -84.52247858047485,
+                    38.04004728133727
+                  ],
+                  [
+                    -84.52330470085144,
+                    38.04056271849947
+                  ],
+                  [
+                    -84.52386260032654,
+                    38.04126404520498
+                  ],
+                  [
+                    -84.52422738075256,
+                    38.0411795483674
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+        var pointOptions = {
+            color: "green"
+        }
+        var lineOptions = {
+            color: "blue"  
+        }
+        var polygonOptions = {
+            color: "yellow"   
+        }
+        var placesLeaflet = L.geoJson(BrazilLocations, {
+            pointToLayer : function(feature, latlng) {
+                console.log(feature,latlng);
+                return L.circle(latlng, feature.properties.size);
+            },
+            onEachFeature: function(feature, layer) {
+                if(feature.geometry.type == "Point") {
+                    layer.setStyle(pointOptions);
+                    layer.bindPopup(feature.properties.Name)
+                }
+                if(feature.geometry.type == "LineString") {
+                    layer.setStyle(lineOptions);
+                    layer.bindPopup(feature.properties.Name)
+                }   
+                if(feature.geometry.type == "Polygon") {
+                    layer.setStyle(polygonOptions);
+                    layer.bindPopup(feature.properties.Name)
+                }
+            },
+            style : function(feature) {
+                return { dashArray: "5, 10",
+                     weight: 4
+                }   
+            }
+        }).addTo(map);
+
+        
+    </script>
+    
+</body>
+
+</html>
