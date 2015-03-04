@@ -82,10 +82,12 @@
         var PowerPlantsLocation = L.layerGroup();
         L.geoJson(plants, {
             pointToLayer : function ( feature, latlng) {
-                console.log (feature);
                 return L.circleMarker( latlng, {
-                    radius: feature.properties.capacity,
-                    color: "red"
+                    radius: feature.properties.capacity*0.0065,
+                    color: "yellow",
+                    weight: 1.5,
+                    fillcolor: "red",
+                    opacity: 1
                 });
             }
         }).addTo(PowerPlantsLocation);
