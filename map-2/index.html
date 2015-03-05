@@ -65,12 +65,10 @@
     <script src="power-plants-assignment.js"></script>
     
     <script>
-
         var map = L.map('map', {
             center: [39.8282, -98.5795],
             zoom: 4,
         });
-       
         var tiles = L.tileLayer('http://a{s}.acetate.geoiq.com/tiles/acetate-hillshading/{z}/{x}/{y}.png', {
             attribution: '&copy;2012 Esri & Stamen, Data from OSM and Natural Earth',
             subdomains: '0123',
@@ -78,34 +76,69 @@
             maxZoom: 30
         });
         map.addLayer(tiles);
-        
         var PowerPlantsLocation = L.layerGroup();
+        plants.features.sort(function(a, b) {
+            return b.properties.capacity - a.properties.capacity;
+        });
+        var LexingtonCoords = [38.029722, -84.494722];
         L.geoJson(plants, {
+            
             pointToLayer : function ( feature, latlng) {
                 return L.circleMarker( latlng, {
-                    radius: feature.properties.capacity*0.0065,
-                    color: "yellow",
-                    weight: 1.5,
-                    fillcolor: "red",
+                    radius: getRadius(feature.properties.source["Coal"]),
+                    color: "red",
+                    weight: 1,
+                    fillColor: "yellow",
+                    fillOpacity: 0.8,
                     opacity: 1
                 });
+            },
+            onEachFeature: function(feature, layer) {
+                var props = feature.properties;
+                var content = "<b>"+props.plant_name+"</b><br>"+
+                        props.capacity.toLocaleString()+" MW<br>";
+                var source = props.source;
+                for(var fuel in source){
+                    content+="<b>"+fuel+"</b>: "+
+                    source[fuel].toLocaleString()+
+                    " MW<br>";
+                }
+                layer.bindPopup(content),
+                layer.on('mouseover', function(e) {
+                    e.target.setStyle({
+                        color: 'yellow',
+                        weight: 1,
+                        fillColor: 'red',
+                        fillOpacity: 0.8,
+                        opacity: 1
+                    });
+                });
+                layer.on('mouseout', function(e) {
+                    e.target.setStyle({
+                        color: "red",
+                        weight: 1,
+                        fillColor: "yellow",
+                        fillOpacity: 0.8,
+                        opacity: 1
+                    });
+                });
+                var distance = feature.geometry.coordinates.distanceTo(LexingtonCoords);
+                console.log(distance);
+            },
+            filter: function(feature, layer) {
+                if (feature.properties.source["Coal"]){
+                    return feature;
+                }
+                if (feature.properties.source["Coal"].toLocateString()<500) {
+                    return feature;
+                }
             }
         }).addTo(PowerPlantsLocation);
         PowerPlantsLocation.addTo(map);
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        function getRadius(area) {
+            var radius = Math.sqrt(area/Math.PI);
+            return radius*0.6;  
+        };
     </script>
     
 </body>
