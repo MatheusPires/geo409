@@ -122,14 +122,10 @@
                         opacity: 1
                     });
                 });
-                var distance = feature.geometry.coordinates.distanceTo(LexingtonCoords);
-                console.log(distance);
             },
             filter: function(feature, layer) {
-                if (feature.properties.source["Coal"]){
-                    return feature;
-                }
-                if (feature.properties.source["Coal"].toLocateString()<500) {
+                var featureCoords = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                if (featureCoords.distanceTo(LexingtonCoords)/1000 < 400 && feature.properties.source["Coal"] && feature.properties.source["Coal"] < 500){
                     return feature;
                 }
             }
