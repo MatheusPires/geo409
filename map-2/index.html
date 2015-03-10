@@ -122,8 +122,15 @@
                         opacity: 1
                     });
                 });
+<<<<<<< HEAD
             filter: function(feature, layer) {
                 if (feature.properties.source["Coal"]){
+=======
+            },
+            filter: function(feature, layer) {
+                var featureCoords = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+                if (featureCoords.distanceTo(LexingtonCoords)/1000 < 400 && feature.properties.source["Coal"] && feature.properties.source["Coal"] < 500){
+>>>>>>> origin/master
                     return feature;
                 }
             }
