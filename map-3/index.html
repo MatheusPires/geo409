@@ -98,9 +98,9 @@
         }
         
         var layerSources = {
-            nuclearLayer: {source: "Nuclear", color: '#ffffbf'},
+            nuclearLayer: {source: "Nuclear", color: '#fc8d59'},
             hydroLayer: {source: "Hydro", color: '#91bfdb'},
-            solarLayer: {source: "Solar", color: '#fc8d59'}
+            solarLayer: {source: "Solar", color: '#ffffbf'}
         }
         var geoJsonLayers = {};
         
@@ -108,28 +108,28 @@
         
         for (var layer in layerSources) {
             geoJsonLayers[layer] = L.geoJson(plants, {
-            pointToLayer: function(feature,latlng) {
-                return L.circleMarker(latlng, commonStyles);
-            },
-            filter: function(feature) {
-                if(feature.properties.fuel_source[layerSources[layer].source]){
-                    return feature;
-                }
-            },
-            style: function(feature) {
-                return {
-                    color: layerSources[layer].color,
-                    fillColor: layerSources[layer].color,
-                    radius: getRadius(feature.properties.fuel_source[layerSources[layer].source])
-                } 
-            } 
-        }).addTo(map);        
+                pointToLayer: function(feature,latlng) {
+                    return L.circleMarker(latlng, commonStyles);
+                },
+                filter: function(feature) {
+                    if(feature.properties.fuel_source[layerSources[layer].source]){
+                        return feature;
+                    }
+                },
+                style: function(feature) {
+                    return {
+                        color: layerSources[layer].color,
+                        fillColor: layerSources[layer].color,
+                        radius: getRadius(feature.properties.fuel_source[layerSources[layer].source])
+                    }
+                },
+            }).addTo(map);  
         }
         
         /////////////////////////
         
         map.on('click', function(e) {  
-            for (var layer in layerSources) {
+            for (var layer in geoJsonLayers) {
                 geoJsonLayers[layer].eachLayer(function(layer, feature) {
                     var distance = e.latlng.distanceTo(layer.getLatLng())/1000;
                     if (distance > 500) {
@@ -142,10 +142,12 @@
                             stroke: true,
                             fill: true
                         });
-                        console.log(layerSources[layer]);
+                        for(var s in layer.feature.properties.fuel_source) {  
+                        }
                         var props = layer.feature.properties;
                         var content = "<b>"+props.plant_name+"</b><br>My capacity is of: <b>"+
-                        props.capacity_mw.toLocaleString()+" MW</b><br>";
+                        props.capacity_mw.toLocaleString()+" MW<br>"+
+                        s+"</b> Is my fuel source.<br>";
                         layer.bindPopup("I am <b>"+distance.toLocaleString()+ 
                                    " km</b><br> from the click point.<br>"+content);
                     }
@@ -169,8 +171,12 @@
                             stroke: true,
                             fill: true
                         });
+                        for(var s in layer.feature.properties.fuel_source) {  
+                        }
                         var props = layer.feature.properties;
-                        var content = "<b>"+props.plant_name+" MW</b>";
+                        var content = "<b>"+props.plant_name+"</b><br>My capacity is of: <b>"+
+                        props.capacity_mw.toLocaleString()+" MW<br>"+
+                        s+"</b> Is my fuel source.<br>";
                         props.capacity_mw.toLocaleString()+" MW</b><br>";
                         layer.bindPopup("I am <b>"+distance.toLocaleString()+ 
                                    " km</b><br> from the click point.<br>"+content);
@@ -188,11 +194,11 @@
         
         
         var sourcesLayers = {
-            "<b style='color:#ffffbf'>Nuclear</b>": geoJsonLayers.nuclearLayer,
+            "<b style='color:#fc8d59'>Nuclear</b>": geoJsonLayers.nuclearLayer,
             "<b style='color:#91bfdb'>Hydro</b>": geoJsonLayers.hydroLayer,
-            "<b style='color:#fc8d59'>Solar</b>": geoJsonLayers.solarLayer
+            "<b style='color:#ffffbf; text-shadow: 0px 0px 1px #333;'>Solar</b>": geoJsonLayers.solarLayer
         }
-        L.control.layers(null, sourcesLayers, { collapsed:false }).addTo(map);
+        L.control.layers(null, sourcesLayers, { collapsed:false}).addTo(map);
         
     </script>
     
