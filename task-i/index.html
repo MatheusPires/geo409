@@ -108,18 +108,21 @@
             }).addTo(map);
             drawMap();
         });
-        map.on('click', function(l) {
-            dataLayer.eachLayer(function(layer) {
-                var popup = "<b>"+layer.feature.properties.NAME+"</b><br>"+attribute+": value.toLocateString()<br>";
-                layer.bindPopup(popup);
-            });
-        });
+//        map.on('click', function(l) {
+//            dataLayer.eachLayer(function(layer) {
+//            var popup = "<b>"+layer.feature.properties.NAME+"</b><br>"+attribute+": "+values.toLocateString()+"<br>";
+//            layer.bindPopup(popup);
+//            });
+//        });
         function drawMap() {
             var breaks = getClassBreaks();
             dataLayer.eachLayer(function(layer) {
                 layer.setStyle({
                     fillColor: getColor(layer.feature.properties[attribute]/layer.feature.properties[norm], breaks)
                 });
+                var popup = "<b>"+layer.feature.properties.NAME+"</b><br>"+attribute+": "+layer.feature.properties[attribute]/layer.feature.properties[norm]+"<br>";
+                layer.bindPopup(popup);
+                //Added the two lines on the top and commented what was wrong.
             });
             drawLegend(breaks);
         }
