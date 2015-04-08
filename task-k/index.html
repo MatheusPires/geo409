@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>Module 15 Lab Template</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.0/papaparse.min.js"></script>
+    <script src="simple_statistics.js"></script>
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: Lato, sans-serif;
+            color: #0D0000;
+        }
+        header {
+            padding: 6px 10%;
+        }
+        h1 {
+            position: absolute;
+            z-index: 100;
+            top: 10px;
+            left: 60px;
+            padding: 8px 15px;
+            margin: 0;
+            color: whitesmoke;
+            font-size: 1.5em;
+            background: rgba(25,25,25,0.8);
+            border-radius: 5px;  
+        }
+        #map {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+        }
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+        p {
+            font-size: 1em;
+            color: #001323;
+        }  
+        #map {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Matheus Caputo's Map</h1>
+    <div id='map'></div>
+    
+    <script>
+        
+        var options = {
+            center: [38.2, -94],
+            zoom: 4,
+            minZoom: 3,
+            maxZoom: 6,
+            dragging: true,
+            zoomControl: true
+        }
+        var map = L.map('map', options);
+        
+// load map tiles and add to map
+                
+        var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+            subdomains: 'abcd',
+        });
+        map.addLayer(tiles);
+        
+// declare global variables
+
+        var dataLayer,
+            ATTRIBUTE = '2001',
+            NORMstate = 'PR';
+        
+// AJAX requests to load data files
+ 
+        $.getJSON("us-states.json", function(states) {
+
+            Papa.parse('states-unemployment.csv', {
+                download: true,
+                header: true,
+                complete: function(data) {
+
+                    // data is accessible to us here
+                    processData(states, data);
+                    getClassBreaks(data.data);
+                    // note that states is also accessible here!
+
+                }
+            }); // end of Papa.parse() 
+            drawMap(states);
+            updateMap(states);
+        });  // end of $.getJSON()
+        
+// function to process/bind data
+        
+        function processData(states, data) {
+            for (var state in states.features) {
+
+                var props = states.features[state].properties;
+
+                for(var d in data.data) {
+
+                    if(props.STATEFP == data.data[d].STATE_FIP) {
+                        states.features[state].properties = data.data[d]; 
+                        break;
+                        
+                    }
+                }
+            }
+        }
+        
+// function to draw the map
+        
+        function drawMap(data) {
+            //this draw the geometries on the basemap
+            dataLayer = L.geoJson(data, {
+                style: function(feature) {
+                    // style counties with initial default path options
+                    return {
+                            color: '#ffffff',
+                            weight: 2,
+                            fillOpacity: 1,
+                            fillColor: 'rgba(31, 120, 180, 0)'
+                    }
+                }          
+            }).addTo(map);
+            //this get the class breaks for the initial attributes
+            var breaks = getClassBreaks();
+            console.log(breaks);
+        }
+// function to update the map
+        
+        function updateMap(states) {
+
+            
+        }
+// function get the class breaks   
+        
+        function getClassBreaks(argument){
+            var values = [];
+            var value;
+            for (var c in argument) {
+                value = argument[c][ATTRIBUTE];
+                values.push(value);
+            }
+            var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]);
+            return breaks;
+        }
+        
+// function to get the color value
+        
+        function getColor(d, breaks) {
+            //function receiver a single normalyzed data attribute
+            //may be called inside drawMap function
+            if (d <= breaks[1]) {
+                return '#ffffb2';
+            } else if (d <= breaks[2]) {
+                return '#fecc5c';
+            } else if (d <= breaks[3]) {
+                return '#fd8d3c';
+            } else if (d <= breaks[4]) {
+                return '#f03b20';
+            } else if (d <= breaks[5]) {
+                return '#bd0026';
+            }
+        }
+        
+// function to draw the legend
+        
+        
+        
+// function to update the legend
+
+        
+        
+// function to create the range slider
+
+        
+        
+    </script>
+    
+</body>
+
+</html>
