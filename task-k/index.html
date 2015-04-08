@@ -57,6 +57,32 @@
             top: 0;
             bottom: 0;
         }
+        .legend {
+            padding: 6px 8px;
+            font-size: 1em;
+            background: rgba(75,75,75,0.8);
+            color: whitesmoke;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            width: 160px;
+        }
+        .legend h3 {
+            font-size: 1.1em;
+            font-weight: bold;
+            line-height: 1em;
+            color: whitesmoke;
+            margin: 0;
+        }
+        .legend li {
+            list-style-type: none;
+            height: 22px;
+        }
+        .legend span {
+            width: 30px;
+            height: 20px;
+            float: left;
+            margin-right: 10px;
+        }
     </style>
 </head>
 
@@ -87,8 +113,7 @@
 // declare global variables
 
         var dataLayer,
-            ATTRIBUTE = '2001',
-            NORMstate = 'PR';
+            ATTRIBUTE = '2001';
         
 // AJAX requests to load data files
  
@@ -101,13 +126,9 @@
 
                     // data is accessible to us here
                     processData(states, data);
-                    getClassBreaks(data.data);
                     // note that states is also accessible here!
-
                 }
             }); // end of Papa.parse() 
-            drawMap(states);
-            updateMap(states);
         });  // end of $.getJSON()
         
 // function to process/bind data
@@ -126,42 +147,48 @@
                     }
                 }
             }
+            drawMap(states);
         }
         
 // function to draw the map
         
-        function drawMap(data) {
+        function drawMap(states) {
             //this draw the geometries on the basemap
-            dataLayer = L.geoJson(data, {
+            dataLayer = L.geoJson(states, {
                 style: function(feature) {
                     // style counties with initial default path options
                     return {
                             color: '#ffffff',
                             weight: 2,
-                            fillOpacity: 1,
-                            fillColor: 'rgba(31, 120, 180, 0)'
+                            fillOpacity: 0.8,
+                            fillColor: 'rgba(189, 0, 38, 0)'
                     }
                 }          
             }).addTo(map);
-            //this get the class breaks for the initial attributes
-            var breaks = getClassBreaks();
-            console.log(breaks);
+            drawLegend();
+            updateMap();
         }
 // function to update the map
         
-        function updateMap(states) {
-
-            
+        function updateMap() {
+            //this get the class breaks for the initial attributes
+            var breaks = getClassBreaks();
+            dataLayer.eachLayer(function(layer) {
+                layer.setStyle({
+                    fillColor: getColor(layer.feature.properties[ATTRIBUTE], breaks)
+                });
+            });
+            updateLegend(breaks);
         }
 // function get the class breaks   
         
-        function getClassBreaks(argument){
+        function getClassBreaks(){
             var values = [];
             var value;
-            for (var c in argument) {
-                value = argument[c][ATTRIBUTE];
-                values.push(value);
-            }
+            dataLayer.eachLayer(function(layer) {
+                value = layer.feature.properties[ATTRIBUTE];
+                values.push(Number(value));
+            });
             var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]);
             return breaks;
         }
@@ -170,7 +197,6 @@
         
         function getColor(d, breaks) {
             //function receiver a single normalyzed data attribute
-            //may be called inside drawMap function
             if (d <= breaks[1]) {
                 return '#ffffb2';
             } else if (d <= breaks[2]) {
@@ -186,11 +212,27 @@
         
 // function to draw the legend
         
-        
+        function drawLegend() {
+            var legend = L.control({position: 'bottomright'});
+            legend.onAdd = function(map) {
+                var div = L.DomUtil.create('div', 'legend');
+                return div;
+            }
+            legend.addTo(map);
+        }
         
 // function to update the legend
 
-        
+        function updateLegend(breaks) {
+            var legend = $('.legend').html("<h3>% Unemployment :" + ATTRIBUTE + "</h3><ul>"); 
+            for (var i = 0; i < breaks.length-1; i++) {
+                var color = getColor(breaks[i + 1], breaks);
+                legend.append('<li><span style="background:' + color + '"></span> ' +
+                    (breaks[i]*100).toLocaleString() + ' &mdash; ' + 
+                    (breaks[i + 1]*100).toLocaleString() + '</li>');
+            }
+            legend.append("</ul>");
+        }
         
 // function to create the range slider
 
