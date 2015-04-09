@@ -83,11 +83,36 @@
             float: left;
             margin-right: 10px;
         }
+        #ui-controls {
+            width: 176px;   
+            padding: 8px 15px 8px 15px;
+            background: rgba(75,75,75,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px; 
+            color: whitesmoke;
+        }
+        .year-slider {
+            width: 100%;
+        }
+        #ui-controls .min {
+            float: left;   
+        }
+        #ui-controls .max {
+            float: right;
+        }
     </style>
 </head>
 
 <body>
     <h1>Matheus Caputo's Map</h1>
+    
+    <div id="ui-controls">
+        <label><span class="min">2001</span><span class="max">2013</span>
+        <input type="range" min="2001", max="2013", 
+                value="2001", step="1" class="year-slider"></input>
+        </label>
+    </div>
+    
     <div id='map'></div>
     
     <script>
@@ -165,6 +190,7 @@
                     }
                 }          
             }).addTo(map);
+            createSliderUI();
             drawLegend();
             updateMap();
         }
@@ -236,7 +262,22 @@
         
 // function to create the range slider
 
-        
+        function createSliderUI() {
+            var sliderControl = L.control({ position: 'bottomleft'} );
+            sliderControl.onAdd = function(map) {
+                var slider = L.DomUtil.get("ui-controls");
+                    L.DomEvent.addListener(slider, 'mousedown', function(e) { 
+                        L.DomEvent.stopPropagation(e); 
+                    });
+                return slider;
+            }
+            sliderControl.addTo(map);
+            $(".year-slider")
+                .on('input change', function() {
+                    attribute = $(this).val();
+                    updateMap();
+                });
+        }
         
     </script>
     
