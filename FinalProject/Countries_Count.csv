@@ -1,4 +1,4 @@
-country,fips,city,source,2005,2006,2007,2008,2009,2010,2011,2012
+ï»¿country,fips,city,source,2005,2006,2007,2008,2009,2010,2011,2012
 Albania,AL,Tirana,CTS,24,19,21,18,25,33,28,0
 Algeria,AG,Algiers,CTS,21,22,38,47,35,31,40,0
 Andorra,AN,Andorra la Vella,CTS,0,0,0,0,1,1,1,0
@@ -20,8 +20,8 @@ Bulgaria,BU,Sofia,CTS,38,27,24,27,26,20,20,24
 Canada,CA,Toronto,CTS,99,96,103,101,84,79,78,0
 Chile,CI,Santiago de Chile,CTS,253,221,278,224,250,205,239,0
 China,CH,Hong Kong,CTS,34,35,18,36,47,35,17,27
-Colombia,CO,Bogotá,National Institute of Forensic Medicine,1689,1336,1401,1466,1649,1743,1654,1281
-Costa Rica,CS,San José,CTS,0,46,65,93,80,68,61,55
+Colombia,CO,BogotÃ¡,National Institute of Forensic Medicine,1689,1336,1401,1466,1649,1743,1654,1281
+Costa Rica,CS,San JosÃ©,CTS,0,46,65,93,80,68,61,55
 Croatia,HR,Zagreb,CTS,16,11,6,15,5,10,11,10
 Cyprus,CY,Nicosia,CTS,3,8,3,3,3,4,2,5
 Czech Republic,EZ,Prague,CTS,15,21,21,15,18,16,10,18
@@ -102,7 +102,7 @@ Spain,SP,Madrid,CTS,36,37,34,39,32,28,21,28
 Sri Lanka,CE,Colombo,National police,0,66,55,55,31,0,0,0
 State of Palestine,GZ&WE,Hebron,CTS,17,0,0,0,0,0,0,0
 Sudan,SU,Khartoum,CTS,0,0,0,263,0,0,0,0
-Switzerland,WZ,Zürich,CTS,0,0,0,0,4,11,1,0
+Switzerland,WZ,ZÃ¼rich,CTS,0,0,0,0,4,11,1,0
 Syrian Arab Republic,SY,Aleppo,CTS,0,0,155,131,0,0,0,0
 Tajikistan,TI,Dushanbe,CTS,38,29,26,19,19,24,23,0
 Thailand,TH,Bangkok,CTS,311,327,283,252,225,219,0,0

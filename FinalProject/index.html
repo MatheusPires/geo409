@@ -10,6 +10,7 @@
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.0/papaparse.min.js"></script>
     <script src="simple_statistics.js"></script>
+
     
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
     <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
@@ -26,8 +27,16 @@
             padding: 6px 10%;
         }
         h1 {
+            position: absolute;
+            z-index: 100;
+            top: 10px;
+            left: 60px;
             padding: 8px 15px;
-            margin: 0; 
+            margin: 0;
+            color: whitesmoke;
+            font-size: 1.5em;
+            background: rgba(25,25,25,0.8);
+            border-radius: 5px; 
         }
         #map {
             position: absolute;
@@ -104,7 +113,7 @@
 </head>
 
 <body>
-    <h1>Map Title Goes Here</h1>
+    <h1>Map of the homicide counts in the most important city of a country:</h1>
     
     <div id="ui-controls">
         <label><span class="min">2005</span><span class="max">2012</span>
@@ -119,9 +128,9 @@
         
         var options = {
             center: [-20.753889,  -42.881944],
-            zoom: 3,
-            minZoom: 1,
-            maxZoom: 6,
+            zoom: 4,
+            minZoom: 2,
+            maxZoom: 30,
             dragging: true,
             zoomControl: true
         }
@@ -129,32 +138,33 @@
         
 // load map tiles and add to map
         
-        var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+         var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
             subdomains: 'abcd',
         });
         map.addLayer(tiles);
-                
+
 // declare global variables
 
-        var dataLayer,
-            attribute = '2005';
+        var countriesLayer,
+            attribute = 2005,
+            dataCount = 'Countries_Count.csv',
+            dataRate = 'Countries_Rate.csv';
         
 // AJAX requests to load data files
-        
-        $.getJSON('Countries_Boundaries.json', function(countries) {
-            //Papa.parse function to join the data on the csv to the geometry
-            Papa.parse('Countries_Count.csv', {
+        $.getJSON("Countries_Boundaries.json", function(countries) {
+            //function to bind the data on the csv to the JSON
+            Papa.parse(dataRate, {
                 download: true,
                 header: true,
                 complete: function(data) {
-                    //function to update the map
                     processData(countries, data);
                 }
             });
         });
  
 // function to process/bind data
+        
         function processData(countries, data) {
             for (var country in countries.features){
                 var props = countries.features[country].properties;
@@ -167,10 +177,11 @@
             }
             drawMap(countries);
         }
+        
 // function to draw the map
         
         function drawMap(data) {
-            dataLayer = L.geoJson(data, {
+            countriesLayer = L.geoJson(data, {
                 style: function(feature) {
                     return {
                         color: '#ffffff',
@@ -180,22 +191,21 @@
                     }
                 }
             }).addTo(map);
-            //call the other functions to make the map
             drawInfo();
             createYearSlider();
             drawLegend();
             updateMap();
-        };
+        }
         
-// function to update the map
+// function to update the map  
         
         function updateMap() {
-            var breaks = getClassBreaks();
-            dataLayer.eachLayer(function(layer) {
+            var breaks = getBreaks();
+            countriesLayer.eachLayer(function(layer) {
                 layer.setStyle({
                     fillColor: getColor(layer.feature.properties[attribute], breaks)
                 });
-                layer.bindPopup("<b>"+layer.feature.properties["country"]+" ("+layer.feature.properties["fips"]+")</b><br>" + attribute + ": " + layer.feature.properties[attribute] + "");
+                layer.bindPopup("<b>"+layer.feature.properties["country"]+" ("+layer.feature.properties["city"]+")</b><br>" + attribute + ": " + layer.feature.properties[attribute] + "");
                 layer.on('mouseover', function() {
                     updateInfo(this); 
                     layer.setStyle({color: '#000'}).bringToFront();
@@ -209,20 +219,37 @@
         
 // function get the class breaks
         
-        function getClassBreaks() {
+        function getBreaks() {
             var values = [];
             var value;
-            dataLayer.eachLayer(function(layer) {
+            //Below is the code I introduced to fix the values problem.
+            //the last code was introducing all the values in the attribute into the array "values".
+            //this new code oly takes into consideration the different values, by testing if there is any similar value already existing in the "values" array.
+            countriesLayer.eachLayer(function(layer) {
                 value = layer.feature.properties[attribute];
-                values.push(Number(value));
+                //"i" is a temporary boolean variable, used to test if the new value to be introduced into the "values" array already exists or not, Being set with false as a default.
+                var i = false;
+                //A for loop iterates through all the values already into the array.
+                for(var count = 0; count < values.length; count++) {
+                    //the if statement tests if there is any simillar value into the array.
+                    if(value == values[count]){
+                        //if the statement passes, that means that the value already exists, and the boolean is set as true.
+                        i = true;
+                    }
+                }
+                //outside the for loop, another statement tests if the boolean is false, and if it is, the new value is asigned into the array "values".
+                if(i == false){
+                    values.push(Number(value));
+                }
+                //once this is done, the "values" array only contains distinct values, and can now be used 
+                
             });
             var breaks = ss.quantile(values, [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]);
-            console.log(breaks);
             return breaks;
         }
         
 // function to get the color value
-         
+        
         function getColor(d, breaks) {
             if (d <= breaks[0]) {
                 return 'rgba(5, 113, 176, 0)';
@@ -261,9 +288,9 @@
         }
         
 // function to update the legend
-
+        
         function updateLegend(breaks) {
-            var legend = $('.legend').html("<h3>% Unemployment: " + attribute + "</h3><ul>"); 
+            var legend = $('.legend').html("<h3>Counts per Country: " + attribute + "</h3><ul>"); 
             for (var i = 0; i < breaks.length-1; i++) {
                 var color = getColor(breaks[i + 1], breaks);
                 legend.append('<li><span style="background:' + color + '"></span> ' +
@@ -272,12 +299,10 @@
             }
             legend.append("</ul>");
         }
-        
+
 // function to create the range slider
         
-        
-        function createYearSlider() {
-            var sliderControl = L.control({ position: 'bottomleft'} );
+        function createYearSlider() {            var sliderControl = L.control({ position: 'bottomleft'} );
             sliderControl.onAdd = function(map) {
                 var slider = L.DomUtil.get("ui-controls");
                     L.DomEvent.addListener(slider, 'mousedown', function(e) { 
@@ -291,27 +316,27 @@
                     updateMap();
                 });
         }
-
+        
 // function to draw the info panel
     
-    function drawInfo() {
+        function drawInfo() {
             var info = L.control({position: 'topright'});
                 info.onAdd = function(map) {
                     var div = L.DomUtil.create('div', 'info');
                     return div;  
                 }
                 info.addTo(map);
-                $(".info").hide();
+//                $(".info").hide();
             }
         
 // function to update the info panel
         
         function updateInfo(layer) {
             var props = layer.feature.properties;
-            var html = "<b>" + props['NAME'] + " Country </b><br><h3>2005: <br>2003: " + props[2003] + " <br>2004: " + props[2004] + " <br>2005: " + props[2005] + " <br>2006: " + props[2006] + " <br>2007: " + props[2007] + " <br>2008: " + props[2008] + " <br>2009: " + props[2009] + " <br>2010: " + props[2010] + " <br>2011: " + props[2011] + " <br>2012: " + props[2012];
+            var html = "<b>Country: " + props['country'] + "<br>City: " + props['city'] + "</b><br>2005: " + props[2005] + " <br>2006: " + props[2006] + " <br>2007: " + props[2007] + " <br>2008: " + props[2008] + " <br>2009: " + props[2009] + " <br>2010: " + props[2010] + " <br>2011: " + props[2011] + " <br>2012: " + props[2012] + "<br>Source: " + props['source'];
             $(".info").html(html);
         }
-        
+
     </script>
     
 </body>
